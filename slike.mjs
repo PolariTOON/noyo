@@ -1,6 +1,6 @@
-import History from "./history.mjs";
+import Timeline from "./timeline.mjs";
 import State from "./state.mjs";
-const trim = /^[\t\f\n\r ]+|[\t\f\n\r ]$/g;
+const trim = /^[\t\f\n\r ]+|[\t\f\n\r ]+$/g;
 const split = /[\t\f\n\r ]+/g;
 const escape = /[^-0-9A-Z_a-z]/g;
 const elements = new WeakMap();
@@ -14,7 +14,7 @@ const visit = (graph, states, id) => {
 	} else {
 		states[id] = null;
 		const [Class = State, ...options] = graph[id];
-		let element = document.querySelector(`:root > body > section#${id.replace(escape, (character) => `\\${character.codePointAt(0).toString(16)}`)}`);
+		let element = document.querySelector(`html:root > body > section#${id.replace(escape, (character) => `\\${character.codePointAt(0).toString(16)}`)}`);
 		if (!element) {
 			element = document.createElement("section");
 			element.id = id;
@@ -63,44 +63,34 @@ const runLoop = (graph, entry) => {
 	const canvas = document.createElement("canvas");
 	canvas.width = 1920;
 	canvas.height = 1080;
-	const context = canvas.getContext("2d");
+	const canvasContext = canvas.getContext("2d");
 	const stack = [];
-	const inputs = [];
-	const tasks = [];
-	let duration;
-	const measure = () => {
-		return duration;
+	const queue = [];
+	let lastTimestamp;
+	let delta;
+	const getDelta = () => {
+		return delta;
 	};
-	const history = new History(tasks, push, pop, measure);
-	const loop = (delta) => {
-		duration = delta;
-		const state = stack[stack.length - 1];
-		for (let i = 0, l = inputs.length; i < l; ++i) {
-			state.listen(inputs.shift());
+	const timeline = new Timeline(stack, push, pop, getDelta);
+	const loop = (timestamp) => {
+		delta = timestamp - lastTimestamp;
+		lastTimestamp = timestamp;
+		for (let i = 0, l = queue.length; i < l; ++i) {
+			stack[stack.length - 1].listen(queue.shift());
 		}
-		state.update(history);
-		state.render(context);
-		while (tasks.length > 0) {
-			const [task, ...options] = tasks.shift();
-			task(stack, ...options);
-		}
+		stack[stack.length - 1].update(timeline);
+		stack[stack.length - 1].render({canvasContext});
 		requestAnimationFrame(loop);
 	};
-	requestAnimationFrame(() => {
-		push(stack, states[entry], []);
-		loop(0);
+	requestAnimationFrame((timestamp) => {
+		lastTimestamp = timestamp;
 		document.body.prepend(canvas);
+		push(stack, states[entry], []);
+		stack[stack.length - 1].render({canvasContext});
 		document.addEventListener("keydown", (event) => {
-			switch (event.key) {
-				case "Escape": {
-					tasks.push([pop]);
-					break;
-				}
-				default: {
-					inputs.push(event);
-				}
-			}
+			queue.push(event);
 		});
+		requestAnimationFrame(loop);
 	});
 };
 export default runLoop;

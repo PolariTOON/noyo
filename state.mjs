@@ -18,8 +18,8 @@ const State = class State {
 	pause() {}
 	resume() {}
 	stop() {}
+	render() {}
 	listen() {}
 	update() {}
-	render() {}
 };
 export default State;
