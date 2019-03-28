@@ -1,15 +1,4 @@
 const ownCaches = new WeakMap();
-const toAsync = async (tasks, task, ...options) => {
-	return new Promise((resolve, reject) => {
-		tasks.push([(...options) => {
-			try {
-				resolve(task(...options));
-			} catch (error) {
-				reject(error);
-			}
-		}, ...options]);
-	});
-};
 const Timeline = class Timeline {
 	constructor(stack, goTo, goBack, getDelta) {
 		const ownCache = {};
@@ -26,12 +15,10 @@ const Timeline = class Timeline {
 	goTo(state, ...options) {
 		const ownCache = ownCaches.get(this);
 		ownCache.goTo(ownCache.stack, state, options);
-		// return toAsync(ownCache.tasks, ownCache.goTo, state, options);
 	}
 	goBack(...options) {
 		const ownCache = ownCaches.get(this);
 		ownCache.goBack(ownCache.stack, options);
-		// return toAsync(ownCache.tasks, ownCache.goBack, options);
 	}
 };
 export default Timeline;
