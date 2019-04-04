@@ -22,4 +22,5 @@ const State = class State {
 	update() {}
 	render() {}
 };
-export default State;
+export {State};
+export default {State};

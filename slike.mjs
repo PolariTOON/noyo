@@ -1,10 +1,6 @@
-import Timeline from "./timeline.mjs";
-import State from "./state.mjs";
-const trim = /^[\t\f\n\r ]+|[\t\f\n\r ]+$/g;
-const split = /[\t\f\n\r ]+/g;
-const escape = /[^-0-9A-Z_a-z]/g;
-const elements = new WeakMap();
-const visit = (graph, states, id) => {
+import {getEmulatedGamepads} from "./gamepad.mjs";
+import {State} from "./state.mjs";
+const visit = (trim, split, escape, elements, graph, states, id) => {
 	if (states.hasOwnProperty(id)) {
 		if (states[id] != null) {
 			return states[id];
@@ -25,14 +21,14 @@ const visit = (graph, states, id) => {
 		successorNames = successorNames.replace(trim);
 		const successorList = successorNames ? successorNames.split(split) : [];
 		const successors = successorList.map((id) => {
-			return visit(graph, states, id);
+			return visit(trim, split, escape, elements, graph, states, id);
 		});
 		const state = states[id] = new Class(element, successors, ...options);
 		elements.set(state, element);
 		return state;
 	}
 };
-const push = (stack, state, options) => {
+const push = (elements, stack, state, options) => {
 	const {length} = stack;
 	if (length > 0) {
 		stack[length - 1].pause(...options);
@@ -42,7 +38,7 @@ const push = (stack, state, options) => {
 	elements.get(state).hidden = false;
 	state.play(...options);
 };
-const pop = (stack, options) => {
+const pop = (elements, stack, options) => {
 	const {length} = stack;
 	if (length > 1) {
 		stack[length - 1].stop(...options);
@@ -56,41 +52,54 @@ const runLoop = (graph, entry) => {
 	if (!graph.hasOwnProperty(entry)) {
 		throw new Error(`entry not in found in ${graph}`);
 	}
+	const trim = /^[\t\f\n\r ]+|[\t\f\n\r ]+$/g;
+	const split = /[\t\f\n\r ]+/g;
+	const escape = /[^-0-9A-Z_a-z]/g;
+	const elements = new WeakMap();
 	const states = {};
 	for (const id in graph) {
-		visit(graph, states, id);
+		visit(trim, split, escape, elements, graph, states, id);
 	}
 	const canvas = document.createElement("canvas");
 	canvas.width = 1920;
 	canvas.height = 1080;
 	const canvasContext = canvas.getContext("2d");
 	const stack = [];
-	const queue = [];
 	let lastTimestamp;
-	let delta;
-	const getDelta = () => {
-		return delta;
-	};
-	const timeline = new Timeline(stack, push, pop, getDelta);
 	const loop = (timestamp) => {
-		delta = timestamp - lastTimestamp;
+		const gamepads = navigator.getGamepads().map((gamepad) => {
+			return gamepad !== null && gamepad.connected ? gamepad : null;
+		});
+		const emulatedGamepads = getEmulatedGamepads();
+		const delta = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
-		for (let i = 0, l = queue.length; i < l; ++i) {
-			stack[stack.length - 1].listen(queue.shift());
-		}
-		stack[stack.length - 1].update(timeline);
-		stack[stack.length - 1].render({canvasContext});
+		stack[stack.length - 1].listen({
+			gamepads,
+			emulatedGamepads
+		});
+		stack[stack.length - 1].update({
+			delta,
+			goTo(state, ...options) {
+				push(elements, stack, state, options);
+			},
+			goBack(...options) {
+				pop(elements, stack, options);
+			}
+		});
+		stack[stack.length - 1].render({
+			canvasContext
+		});
 		requestAnimationFrame(loop);
 	};
 	requestAnimationFrame((timestamp) => {
 		lastTimestamp = timestamp;
 		document.body.prepend(canvas);
-		push(stack, states[entry], []);
-		stack[stack.length - 1].render({canvasContext});
-		document.addEventListener("keydown", (event) => {
-			queue.push(event);
+		push(elements, stack, states[entry], []);
+		stack[stack.length - 1].render({
+			canvasContext
 		});
 		requestAnimationFrame(loop);
 	});
 };
-export default runLoop;
+export {runLoop};
+export default {runLoop};
