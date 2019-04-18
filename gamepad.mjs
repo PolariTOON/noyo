@@ -103,7 +103,8 @@ const gamepadPrototypeHandler = {
 						}
 						case "axes":
 						case "buttons":
-						case "hapticActuators": {
+						case "hapticActuators":
+						case "lightIndicators": {
 							return [];
 						}
 						case "pose":

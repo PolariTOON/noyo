@@ -1,15 +1,16 @@
 {
-  "name": "slike",
+  "name": "noyo",
   "version": "0.0.0",
   "description": "A lightweight Slick2D-like game engine in the browser",
   "keywords": [
     "game engine",
     "finite-state machine"
   ],
-  "repository": "https://github.com/tristoon/slike",
+  "repository": "https://github.com/tristoon/noyo",
+  "author": "Tristan LE GODAIS",
   "license": "MIT",
-  "browser": "slike.mjs",
-  "module": "slike.mjs",
-  "main": "slike.mjs",
+  "browser": "noyo.mjs",
+  "module": "noyo.mjs",
+  "main": "noyo.mjs",
   "private": true
 }
