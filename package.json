@@ -11,6 +11,5 @@
   "license": "MIT",
   "browser": "noyo.mjs",
   "module": "noyo.mjs",
-  "main": "noyo.mjs",
-  "private": true
+  "main": "noyo.mjs"
 }
