@@ -67,10 +67,10 @@ const runLoop = (graph, entry) => {
 	const stack = [];
 	let lastTimestamp;
 	const loop = (timestamp) => {
-		const gamepads = navigator.getGamepads().map((gamepad) => {
+		const gamepads = [...navigator.getGamepads()].map((gamepad) => {
 			return gamepad !== null && gamepad.connected ? gamepad : null;
 		});
-		const emulatedGamepads = getEmulatedGamepads();
+		const emulatedGamepads = [...getEmulatedGamepads()];
 		const delta = timestamp - lastTimestamp;
 		lastTimestamp = timestamp;
 		stack[stack.length - 1].listen({
