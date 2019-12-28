@@ -119,7 +119,7 @@ const gamepadPrototypeHandler = {
 			}
 		}
 		return Reflect.get(target, key, receiver);
-	}
+	},
 };
 const gamepadPrototypeProxy = new Proxy(gamepadPrototypeTarget, gamepadPrototypeHandler);
 const gamepadHandler = {
@@ -135,7 +135,7 @@ const gamepadHandler = {
 			return gamepadPrototypeTarget;
 		}
 		return prototype;
-	}
+	},
 };
 const emulateGamepad = (handler) => {
 	if (!isNonNullObject(handler)) {
@@ -172,7 +172,7 @@ const connectEmulatedGamepad = (receiver) => {
 		}
 		const event = new CustomEvent("gamepadconnected", {
 			bubbles: true,
-			cancelable: true
+			cancelable: true,
 		});
 		event.gamepad = receiver;
 		Reflect.setPrototypeOf(event, GamepadEvent.prototype);
@@ -200,7 +200,7 @@ const disconnectEmulatedGamepad = (receiver) => {
 		}
 		const event = new CustomEvent("gamepaddisconnected", {
 			bubbles: true,
-			cancelable: true
+			cancelable: true,
 		});
 		event.gamepad = receiver;
 		Reflect.setPrototypeOf(event, GamepadEvent.prototype);

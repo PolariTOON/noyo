@@ -1,4 +1,4 @@
-import {emulateGamepadButton, emulateGamepad} from "./gamepad.mjs";
+import {emulateGamepadButton, emulateGamepad} from "./gamepad.js";
 const isNonNullObject = (object) => {
 	return typeof object === "function" || (typeof object === "object" && object !== null);
 };
@@ -42,7 +42,7 @@ const getKeyboard = function getKeyboard(mapping) {
 						lastStates[index] = states[index];
 					}
 					return Number(lastStates[index]);
-				}
+				},
 			});
 		}));
 		let lastButtons = buttons;
@@ -65,7 +65,7 @@ const getKeyboard = function getKeyboard(mapping) {
 				}
 				return lastTimestamp;
 			},
-			connected: true
+			connected: true,
 		});
 		addEventListener("keydown", (event) => {
 			if (Reflect.has(keyboardMapping, event.code)) {

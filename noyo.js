@@ -1,5 +1,5 @@
-import {getEmulatedGamepads} from "./gamepad.mjs";
-import {State} from "./state.mjs";
+import {getEmulatedGamepads} from "./gamepad.js";
+import {State} from "./state.js";
 const visit = (trim, split, escape, elements, graph, states, id) => {
 	if (states.hasOwnProperty(id)) {
 		if (states[id] != null) {
@@ -75,7 +75,7 @@ const runLoop = (graph, entry) => {
 		lastTimestamp = timestamp;
 		stack[stack.length - 1].listen({
 			gamepads,
-			emulatedGamepads
+			emulatedGamepads,
 		});
 		stack[stack.length - 1].update({
 			delta,
@@ -84,10 +84,10 @@ const runLoop = (graph, entry) => {
 			},
 			goBack(...options) {
 				pop(elements, stack, options);
-			}
+			},
 		});
 		stack[stack.length - 1].render({
-			canvasContext
+			canvasContext,
 		});
 		requestAnimationFrame(loop);
 	};
@@ -96,7 +96,7 @@ const runLoop = (graph, entry) => {
 		document.body.prepend(canvas);
 		push(elements, stack, states[entry], []);
 		stack[stack.length - 1].render({
-			canvasContext
+			canvasContext,
 		});
 		requestAnimationFrame(loop);
 	});
