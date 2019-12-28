@@ -1,6 +1,6 @@
 {
   "name": "noyo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A lightweight Slick2D-like game engine in the browser",
   "keywords": [
     "game engine",
@@ -11,9 +11,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-      ".": "./noyo.js",
-      "./gamepad": "./gamepad.js",
-      "./keyboard": "./keyboard.js",
-      "./state": "./state.js"
+    ".": "./noyo.js",
+    "./gamepad": "./gamepad.js",
+    "./keyboard": "./keyboard.js",
+    "./state": "./state.js"
   }
 }
